@@ -2,6 +2,7 @@ package com.example.weatherapp
 
 import android.content.Intent
 import android.os.AsyncTask
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -9,11 +10,13 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import java.net.URL
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.*
 
 @AndroidEntryPoint
@@ -23,17 +26,30 @@ class MainActivity : AppCompatActivity() {
     val API: String = "98c2488a3bbf1a952d3b8476ca8e342e" // Use API key
     private val viewModel by viewModels<WeatherViewModel>()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         weatherTask().execute()
 
+        val c = Calendar.getInstance()
+
+        val year = c.get(Calendar.YEAR)
+        val month = c.get(Calendar.MONTH)
+        val day = c.get(Calendar.DAY_OF_MONTH)
+
+        val hour = c.get(Calendar.HOUR_OF_DAY)
+        val minute = c.get(Calendar.MINUTE)
+
+        val myLdt = LocalDateTime.of(year, month, day, hour, minute)
+
         findViewById<Button>(R.id.button).setOnClickListener {
             viewModel.saveWeather(
                 Weather(
                     temp = findViewById<TextView>(R.id.temp).text.toString(),
-                    pressure = findViewById<TextView>(R.id.pressure).text.toString()
+                    pressure = findViewById<TextView>(R.id.pressure).text.toString(),
+                    tim = myLdt.toString()
                 )
             )
         }
@@ -75,6 +91,7 @@ class MainActivity : AppCompatActivity() {
                 val sys = jsonObj.getJSONObject("sys")
                 val wind = jsonObj.getJSONObject("wind")
                 val weather = jsonObj.getJSONArray("weather").getJSONObject(0)
+
 
                 val updatedAt: Long = jsonObj.getLong("dt")
                 val updatedAtText =

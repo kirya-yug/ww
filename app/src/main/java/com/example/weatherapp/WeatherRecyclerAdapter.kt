@@ -22,6 +22,7 @@ class WeatherRecyclerAdapter(
         fun bind(weather: Weather) {
             binding.textView.text = weather.pressure.toString()
             binding.textView2.text = weather.temp.toString()
+            binding.textView3.text = weather.tim.toString()
         }
     }
 
